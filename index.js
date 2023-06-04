@@ -1,35 +1,51 @@
 const express = require('express');
-const http = require('http');
-const socketIO = require('socket.io');
-
+const WebSocket = require('ws');
 const app = express();
-const server = http.createServer(app);
-const io = socketIO(server);
 
-// Handle incoming socket.io connections
-io.on('connection', (socket) => {
-  console.log('A client connected.');
+app.get('/',(req,res)=>{
+    res.sendFile(__dirname+'/templates/index.html')
+})
 
-  // Handle custom events from the client
-  socket.on('customEvent', (data) => {
-    console.log('Received custom event:', data);
+const wss = new WebSocket.Server({ noServer: true });
 
-    // Emit a response event back to the client
-    socket.emit('responseEvent', 'Hello from the server!');
+var clients=[]
+wss.on('connection', (ws) => {
+  clients.push(ws)
+  console.log(clients.length)
+  clients.forEach((client)=>{
+    client.send('A new ws connected');
+})  
+  console.log('Websocket connected')
+  
+  ws.on('message', (message) => {
+    const messageString = message.toString('utf8');
+    console.log('Received message a client', messageString);
+    
+        clients.forEach((client)=>{
+            client.send(messageString);
+        })  
+   
+   
+   
+     
   });
-
-  // Handle disconnections
-  socket.on('disconnect', () => {
-    console.log('A client disconnected.');
+  
+  
+  ws.on('close', () => {
+    const index=clients.indexOf(ws)
+    clients=clients.splice(index,1)
+    console.log('WebSocket connection closed');
   });
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/templates/index.html');
-  });
 
-// Start the server
-const port = 3000;
-server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+const server = app.listen(3000, () => {
+  console.log(`Server is running on 3000`);
+});
+
+
+server.on('upgrade', (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit('connection', ws, request);
+  });
 });

@@ -1,26 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+<html>
+
+<head>
+    <title>WebSocket Example</title>
     <script>
-      const socket = io('http://localhost:3000');
+        var socket = new WebSocket("ws://https://smarthome-u4q5.onrender.com:3000");
 
-      socket.on("connect", () => {
-        console.log("Connected to server");
+        socket.onopen = function () {
+            console.log("WebSocket connected");
+        };
 
-        socket.emit("message", "Hello, server!");
-      });
+        socket.onmessage = function (event) {
+            console.log("Received message from server: " + event.data);
+        };
 
-      socket.on("message", (data) => {
-        console.log("Received message:", data);
-      });
+        socket.onclose = function (event) {
+            console.log("WebSocket disconnected");
+        };
+
+        function ToggleLed() {
+            const btn = document.getElementsByTagName("button")[0];
+            if (btn.innerText === "on") {
+                socket.send("turnoff led");
+                btn.innerText = "off";
+                btn.style.backgroundColor = "#d85454";
+            } else {
+                socket.send("turnon led");
+                btn.innerText = "on";
+                btn.style.backgroundColor = "#95df64";
+            }
+        }
     </script>
-  </head>
-  <body>
-    <h1>Hello World</h1>
-  </body>
+    <style>
+        body{
+            margin: 0px;
+            padding: 0px;
+            width: 100vw;
+            height: 100vh;
+            background-color: azure;
+            font-family: 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1{
+            color: aqua;           
+        }
+        button{
+            width: 70px;
+            border: none;
+            background-color: aquamarine;
+            height: 25px;
+            border-radius: 20px;
+        }
+        h2{
+            color: grey;
+            
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>Make your Home Smart</h1>
+        <h2>Lights</h2>
+        <button onclick="ToggleLed()">on</button>
+    </div>
+    
+</body>
+
 </html>
