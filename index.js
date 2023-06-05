@@ -2,11 +2,15 @@ const express = require('express');
 const WebSocket = require('ws');
 const app = express();
 
+const server = app.listen(3000, () => {
+  console.log(`Server is running on 3000`);
+});
+
 app.get('/',(req,res)=>{
     res.sendFile(__dirname+'/templates/index.html')
 })
 
-const wss = new WebSocket.Server({ noServer: true });
+const wss = new WebSocket.Server({ server: server });
 
 var clients=[]
 wss.on('connection', (ws) => {
@@ -39,9 +43,7 @@ wss.on('connection', (ws) => {
 });
 
 
-const server = app.listen(3000, () => {
-  console.log(`Server is running on 3000`);
-});
+
 
 
 server.on('upgrade', (request, socket, head) => {
