@@ -4,7 +4,7 @@
 <head>
     <title>WebSocket Example</title>
     <script>
-        var socket = new WebSocket("wss://smarthome-u4q5.onrender.com");
+        var socket = new WebSocket("ws://localhost");
 
         socket.onopen = function () {
             console.log("WebSocket connected");
@@ -13,7 +13,7 @@
         socket.onmessage = function (event) {
             console.log("Received message from server: " + event.data);
         };
-
+        
         socket.onclose = function (event) {
             console.log("WebSocket disconnected");
         };
